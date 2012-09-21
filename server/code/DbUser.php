@@ -37,6 +37,10 @@ class DbUser {
 	protected function addLog($action, $data) {
 		$this->log->insert(array('action' => $action, 'data' => json_encode($data)));
 	}
+
+	public function getFile($path) {
+		return $this->tree->findOne(array('path' => $path));
+	}
 	
 	public function getAllFiles() {
 		return $this->tree->find(array());

@@ -142,6 +142,7 @@ class DbTable {
 	
 	public function findOne($query) {
 		foreach ($this->find($query, 1) as $row) return $row;
+		throw(new Exception("Empty collection"));
 		return NULL;
 	}
 }

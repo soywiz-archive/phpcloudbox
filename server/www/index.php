@@ -52,7 +52,14 @@ try {
 				<div>Perms: <input type="text" name="perms" value="0777" /></div>
 				<input type="submit" value="submit" />
 				</form>
-				
+
+				<h1>tree.file.get</h1>
+				<form action="." method="get" target="result" enctype="multipart/form-data">
+				<input type="hidden" name="action" value="tree.file.get">
+				<div>Path: <input type="text" name="path" value="" /></div>
+				<input type="submit" value="submit" />
+				</form>
+					
 				<h1>tree.get</h1>
 				<form action="." method="get" target="result" enctype="multipart/form-data">
 				<input type="hidden" name="action" value="tree.get">
@@ -79,6 +86,14 @@ try {
 			if (!isset($_GET['sha1'])) throw(new Exception("Must specify 'sha1'"));
 			$sha1File = new Sha1File($_GET['sha1']);
 			$result = $sha1File->exists();
+		break;
+		case 'tree.file.get':
+			if (!isset($_GET['path'])) throw(new Exception("Must specify 'path'"));
+			$file = $dbUser->getFile($_GET['path']);
+			$sha1File = new Sha1File($file['sha1']);
+			$sha1File->serveFile(basename($_GET['path']));
+			//$dbFiles->serveFile();
+			//$file['path'];
 		break;
 		case 'tree.get':
 			$result = $dbUser->getAllFiles();
