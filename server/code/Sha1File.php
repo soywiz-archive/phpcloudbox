@@ -22,12 +22,14 @@ class Sha1File {
 		header(sprintf('Content-Disposition: filename="%s"', basename($name)));
 		
 		switch ($this->getXSendFileType()) {
+			/*
 			case 'mod_xsendfile':
 				header(sprintf('X-SendFile: %s', $this->local_file_path));
 				exit;
 			case 'nginx_xaccel':
 				header(sprintf('X-Accel-Redirect: %s', $this->local_file_path));
 				exit;
+			*/
 			default:
 				readfile($this->getLocalPath());
 				exit;

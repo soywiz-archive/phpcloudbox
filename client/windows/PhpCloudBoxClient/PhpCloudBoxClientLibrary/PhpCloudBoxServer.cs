@@ -20,6 +20,8 @@ namespace PhpCloudBoxClientLibrary
 
 		public PhpCloudBoxServer(string Url, string Username, string Password)
 		{
+			PhpCloudBoxUtils.AllowInvalidCertificates();
+
 			this.Url = Url;
 			this.Username = Username;
 			this.Password = Password;
