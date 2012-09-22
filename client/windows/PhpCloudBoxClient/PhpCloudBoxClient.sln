@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhpCloudBoxClient", "PhpCloudBoxClient\PhpCloudBoxClient.csproj", "{8A2A8018-3206-4529-A6CB-6BCE7DDB2B60}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhpCloudBoxClientLibrary", "PhpCloudBoxClientLibrary\PhpCloudBoxClientLibrary.csproj", "{A6035030-4E0C-4722-AE7F-33924F8A345A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8A2A8018-3206-4529-A6CB-6BCE7DDB2B60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A2A8018-3206-4529-A6CB-6BCE7DDB2B60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A2A8018-3206-4529-A6CB-6BCE7DDB2B60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A2A8018-3206-4529-A6CB-6BCE7DDB2B60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6035030-4E0C-4722-AE7F-33924F8A345A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6035030-4E0C-4722-AE7F-33924F8A345A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6035030-4E0C-4722-AE7F-33924F8A345A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6035030-4E0C-4722-AE7F-33924F8A345A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
