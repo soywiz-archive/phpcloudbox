@@ -23,10 +23,10 @@ class Sha1File {
 		
 		switch ($this->getXSendFileType()) {
 			case 'mod_xsendfile':
-				header(sprintf('X-SendFile: %s', $this->local_file_path));
+				header(sprintf('X-SendFile: %s', $this->getLocalPath()));
 				exit;
 			case 'nginx_xaccel':
-				header(sprintf('X-Accel-Redirect: %s', $this->local_file_path));
+				header(sprintf('X-Accel-Redirect: %s', $this->getLocalPath()));
 				exit;
 			default:
 				readfile($this->getLocalPath());
