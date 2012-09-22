@@ -1,8 +1,10 @@
 <?php
 
+$lines = file(__DIR__ . '/../login');
+
 return array(
-	'url' => 'http://127.0.0.1:9999',
-	'username' => 'test',
-	'password' => 'test',
+	'url' => trim($lines[0]),
+	'username' => trim($lines[1]),
+	'password' => trim($lines[2]),
 	'output_folder' => 'test_folder',
 );

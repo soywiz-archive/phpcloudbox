@@ -188,12 +188,19 @@ namespace PhpCloudBoxClientLibrary
 			{
 				var HttpClient = GetAuthorizedHttpClient();
 				var MultipartFormDataContent = new MultipartFormDataContent();
-				var StreamContent = new StreamContent(LocalStream);
+				var TrackedLocalStream = new TrackingStream(LocalStream);
+				var StreamContent = new StreamContent(TrackedLocalStream, 256 * 1024);
 				StreamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
 				StreamContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data");
 				StreamContent.Headers.ContentDisposition.Name = "file";
 				StreamContent.Headers.ContentDisposition.FileName = Path.GetFileName(LocalFile);
 				MultipartFormDataContent.Add(StreamContent);
+
+				TrackedLocalStream.OnPositionChanged += (Position) =>
+				{
+					Console.Out.Write("Position: {0}/{1} : {2}%\r", Position, LocalStream.Length, Math.Round(((double)Position / (double)LocalStream.Length) * 100, 2));
+					Console.Out.Flush();
+				};
 
 				var Response = await HttpClient.PostAsync(this.Url + "/?" + PhpCloudBoxUtils.ToQueryString(new NameValueCollection()
 				{

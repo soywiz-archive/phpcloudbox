@@ -78,6 +78,8 @@ server {
 	}
 	
 	location / {
+		client_max_body_size 10000M;
+	
 		root           {$serverRootDir}/www;
 		
 		fastcgi_param  SCRIPT_FILENAME    {$serverRootDir}/www/index.php;

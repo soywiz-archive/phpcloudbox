@@ -48,6 +48,8 @@
     <Compile Include="PhpCloudFolderSynchronizer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PhpCloudBoxServer.cs" />
+    <Compile Include="ProxyStream.cs" />
+    <Compile Include="TrackingStream.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

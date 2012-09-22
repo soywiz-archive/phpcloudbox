@@ -68,12 +68,16 @@ namespace PhpCloudBoxClientLibrary
 							// Upload
 							if (Exists)
 							{
+								Console.WriteLine("  Uploading...");
 								Server.AddAndUploadFileAsync(RemoteFilePath, LocalFilePath).Wait();
+								Console.WriteLine("  Done");
 							}
 							// Remove
 							else
 							{
+								Console.WriteLine("  Deleting...");
 								Server.DeleteFileAsync(RemoteFilePath).Wait();
+								Console.WriteLine("  Done");
 							}
 
 							lock (Changes) Changes.Remove(RemoteFilePath);
@@ -82,6 +86,8 @@ namespace PhpCloudBoxClientLibrary
 						{
 							Console.Error.WriteLine(Exception);
 						}
+
+						Console.WriteLine("/UpdateThreadMain");
 					}
 				}
 			}
@@ -104,8 +110,16 @@ namespace PhpCloudBoxClientLibrary
 					// Download file if we don't have it yet.
 					if (!File.Exists(FullLocalPath))
 					{
-						await Server.DownloadFileToAsync(FileInfo.path, FullLocalPath);
-						Console.WriteLine("Ok");
+						try
+						{
+							await Server.DownloadFileToAsync(FileInfo.path, FullLocalPath);
+							Console.WriteLine("Ok");
+						}
+						catch (Exception Exception)
+						{
+							Console.WriteLine("Error");
+							Console.Error.WriteLine(Exception);
+						}
 					}
 					else
 					{
