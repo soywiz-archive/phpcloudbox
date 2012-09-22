@@ -6,6 +6,6 @@ class Folders {
 	static public $db;
 }
 
-Folders::$root = __DIR__ . '/..';
-Folders::$files = __DIR__ . '/../files';
-Folders::$db = __DIR__ . '/../db';
+Folders::$root = dirname(__DIR__);
+Folders::$files = Folders::$root . '/files';
+Folders::$db = Folders::$root . '/db';
