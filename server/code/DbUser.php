@@ -27,7 +27,7 @@ class DbUser {
 	
 	public function setup() {
 		// Tree
-		$this->tree->defineColumns(array('path', 'sha1', 'ctime', 'mtime', 'perms'));
+		$this->tree->defineColumns(array('path', 'sha1', 'ctime', 'mtime', 'perms', 'exists'));
 		$this->tree->ensureIndex(array('path' => +1), true);
 
 		// Log
@@ -43,7 +43,7 @@ class DbUser {
 	}
 	
 	public function getAllFiles() {
-		return $this->tree->find(array());
+		return $this->tree->find(array('exists' => 1));
 	}
 	
 	public function addFile($path, $sha1, $ctime, $mtime, $perms) {
@@ -53,6 +53,7 @@ class DbUser {
 			'ctime' => $ctime,
 			'mtime' => $mtime,
 			'perms' => $perms,
+			'exists' => 1,
 		);
 		$this->tree->insert($data);
 		$this->addLog('add', $data);
@@ -63,7 +64,8 @@ class DbUser {
 	}
 	
 	public function deleteFile($path) {
-		$this->tree->remove(array('path' => $path));
+		//$this->tree->remove(array('path' => $path));
+		$this->tree->update(array('path' => $path), array('exists' => 0, 'mtime' => time()));
 		$this->addLog('delete', array('path' => $path));
 	}
 }

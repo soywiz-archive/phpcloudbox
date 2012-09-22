@@ -43,7 +43,11 @@ class DbTable {
 	public function defineColumns($columns) {
 		$pdo = $this->db->pdo;
 		
-		$pdo->exec(sprintf('CREATE TABLE IF NOT EXISTS %s (%s);', $this->tableName, implode(', ', $columns)));
+		$pdo->exec(sprintf(
+			'CREATE TABLE IF NOT EXISTS %s (%s);',
+			$this->tableName,
+			implode(', ', array_map(function($v) { return '"' . $v . '"'; }, $columns))
+		));
 	}
 	
 	public function ensureIndex($columns, $unique) {		
@@ -51,7 +55,7 @@ class DbTable {
 		$columnsDef = array();
 		//$columns[]
 		foreach ($columns as $column => $dir) {
-			$columnsDef[] = $column . ' ' . (($dir > 0) ? 'ASC' : 'DESC');
+			$columnsDef[] = '"' . $column . '" ' . (($dir > 0) ? 'ASC' : 'DESC');
 		}
 		
 		$indexType = $unique ? 'UNIQUE INDEX' : 'INDEX';
@@ -59,7 +63,7 @@ class DbTable {
 			$index_name = 'unique_' . $index_name;
 		}
 		
-		$sql = sprintf('CREATE %s IF NOT EXISTS %s ON %s (%s);', $indexType, $index_name, $this->tableName, implode(', ', $columnsDef));
+		$sql = sprintf('CREATE %s IF NOT EXISTS "%s" ON "%s" (%s);', $indexType, $index_name, $this->tableName, implode(', ', $columnsDef));
 		//printf("%s\n", $sql);
 		return $this->execute($sql);
 	}
@@ -67,6 +71,7 @@ class DbTable {
 	public function execute($sql, $values2 = array()) {
 		$pdo = $this->db->pdo;
 		
+		//echo "$sql\n";
 		$statement = $pdo->prepare($sql);
 		$statement->execute($values2);
 		return $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -85,13 +90,33 @@ class DbTable {
 		}
 		
 		$sql = sprintf(
-			'INSERT OR IGNORE INTO %s (%s) VALUES (%s);',
+			'INSERT OR REPLACE INTO "%s" (%s) VALUES (%s);',
 			$this->tableName,
 			implode(', ', $names),
 			implode(', ', $valuesQuestion)
 		);
 		
 		return $this->execute($sql, $values);
+	}
+	
+	public function update($query, $object) {
+		$sets = array();
+		$values = array();
+		$whereValues = array();
+		
+		foreach ($object as $key => $value) {
+			$sets[] = '"' . $key . '"=?';
+			$values[] = $value;
+		}
+		
+		$sql = sprintf(
+			'UPDATE "%s" SET %s %s;',
+			$this->tableName,
+			implode(', ', $sets),
+			$this->getWhereLimit($query, $whereValues)
+		);
+	
+		return $this->execute($sql, array_merge($values, $whereValues));
 	}
 	
 	protected function getWhereLimit($query, &$values, $limit = NULL) {
@@ -108,12 +133,12 @@ class DbTable {
 				foreach ($operators as $operatorKey => $operator) {
 					$operatorValue = &$value[$operatorKey]; 
 					if (isset($operatorValue)) {
-						$conds[] = $key . $operator . '?';
+						$conds[] = '"' . $key . '"' . $operator . '?';
 						$values[] = $operatorValue;
 					}
 				}
 			} else {
-				$conds[] = $key . '=?';
+				$conds[] = '"' . $key . '"=?';
 				$values[] = $value;
 			}
 		}
@@ -125,14 +150,14 @@ class DbTable {
 
 	public function find($query, $limit = NULL) {
 		$values = array();
-		$sql = sprintf('SELECT rowid, * FROM %s %s;', $this->tableName, $this->getWhereLimit($query, $values, $limit));
+		$sql = sprintf('SELECT rowid, * FROM "%s" %s;', $this->tableName, $this->getWhereLimit($query, $values, $limit));
 		//echo $sql;
 		return $this->execute($sql, $values);
 	}
 	
 	public function remove($query, $limit = NULL) {
 		$values = array();
-		$sql = sprintf('DELETE FROM %s %s;', $this->tableName, $this->getWhereLimit($query, $values, $limit));
+		$sql = sprintf('DELETE FROM "%s" %s;', $this->tableName, $this->getWhereLimit($query, $values, $limit));
 		return $this->execute($sql, $values);
 	}
 	
@@ -142,7 +167,7 @@ class DbTable {
 	
 	public function findOne($query) {
 		foreach ($this->find($query, 1) as $row) return $row;
-		throw(new Exception("Empty collection"));
+		throw(new Exception("findOne failed with an empty collection"));
 		return NULL;
 	}
 }

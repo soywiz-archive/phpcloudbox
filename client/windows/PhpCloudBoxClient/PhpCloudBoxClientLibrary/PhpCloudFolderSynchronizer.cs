@@ -23,6 +23,8 @@ namespace PhpCloudBoxClientLibrary
 
 			FileSystemWatcher = new FileSystemWatcher(RootPath);
 			FileSystemWatcher.IncludeSubdirectories = true;
+			FileSystemWatcher.InternalBufferSize = 1 * 1024 * 1024;
+			Console.WriteLine(FileSystemWatcher.InternalBufferSize);
 			FileSystemWatcher.Changed += FileSystemWatcher_Changed;
 			FileSystemWatcher.Renamed += FileSystemWatcher_Renamed;
 			FileSystemWatcher.Created += FileSystemWatcher_Created;
@@ -43,30 +45,44 @@ namespace PhpCloudBoxClientLibrary
 			while (true)
 			{
 				Thread.Sleep(TimeSpan.FromSeconds(0.25));
+				
 				var Now = DateTime.UtcNow;
 				var Updated = new List<string>();
+				
 				lock (Changes)
 				{
 					foreach (var Pair in Changes) if (Pair.Value >= Now) Updated.Add(Pair.Key);
 				}
-				foreach (var RemoteFilePath in Updated)
-				{
-					var LocalFilePath = this.RootPath + "/" + RemoteFilePath;
-					var Exists = File.Exists(LocalFilePath);
-					Console.WriteLine("UpdateThreadMain: {0} :: {1} <-> {2}", RemoteFilePath, LocalFilePath, Exists);
-					
-					// Upload
-					if (Exists)
-					{
-						Server.AddAndUploadFileAsync(RemoteFilePath, LocalFilePath).Wait();
-					}
-					// Remove
-					else
-					{
-						Server.DeleteFileAsync(RemoteFilePath).Wait();
-					}
 
-					lock (Changes) Changes.Remove(RemoteFilePath);
+				if (Updated.Count > 0)
+				{
+					Console.WriteLine("Tasks!");
+					foreach (var RemoteFilePath in Updated)
+					{
+						var LocalFilePath = this.RootPath + "/" + RemoteFilePath;
+						var Exists = File.Exists(LocalFilePath);
+						Console.WriteLine("UpdateThreadMain: {0} :: {1} <-> {2}", RemoteFilePath, LocalFilePath, Exists);
+
+						try
+						{
+							// Upload
+							if (Exists)
+							{
+								Server.AddAndUploadFileAsync(RemoteFilePath, LocalFilePath).Wait();
+							}
+							// Remove
+							else
+							{
+								Server.DeleteFileAsync(RemoteFilePath).Wait();
+							}
+
+							lock (Changes) Changes.Remove(RemoteFilePath);
+						}
+						catch (Exception Exception)
+						{
+							Console.Error.WriteLine(Exception);
+						}
+					}
 				}
 			}
 		}
@@ -102,6 +118,7 @@ namespace PhpCloudBoxClientLibrary
 
 		async public Task UploadUpdatedFilesAsync()
 		{
+			// TODO: ...
 		}
 
 		void UpdateFile(string FullPath)
@@ -115,25 +132,25 @@ namespace PhpCloudBoxClientLibrary
 
 		void FileSystemWatcher_Deleted(object sender, FileSystemEventArgs e)
 		{
-			//Console.WriteLine("Deleted: {0}", e.FullPath);
+			Console.WriteLine("Deleted: {0}", e.FullPath);
 			UpdateFile(e.FullPath);
 		}
 
 		void FileSystemWatcher_Created(object sender, FileSystemEventArgs e)
 		{
-			//Console.WriteLine("Created: {0}", e.FullPath);
+			Console.WriteLine("Created: {0}", e.FullPath);
 			UpdateFile(e.FullPath);
 		}
 
 		void FileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
 		{
-			//Console.WriteLine("Changed: {0}", e.FullPath);
+			Console.WriteLine("Changed: {0}", e.FullPath);
 			UpdateFile(e.FullPath);
 		}
 
 		void FileSystemWatcher_Renamed(object sender, RenamedEventArgs e)
 		{
-			//Console.WriteLine("Renamed: {0} -> {1}", e.OldFullPath, e.FullPath);
+			Console.WriteLine("Renamed: {0} -> {1}", e.OldFullPath, e.FullPath);
 			UpdateFile(e.OldFullPath);
 			UpdateFile(e.FullPath);
 		}
